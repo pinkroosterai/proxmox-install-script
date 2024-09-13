@@ -266,7 +266,7 @@ After the server reboots:
 
 ## Contributing
 
-Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/yourusername/proxmox-install-script/issues) if you want to contribute.
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/pinkroosterai/proxmox-install-script/issues) if you want to contribute.
 
 ## License
 
