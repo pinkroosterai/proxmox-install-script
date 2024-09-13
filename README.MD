@@ -17,7 +17,7 @@ This script automates the installation of Proxmox VE on a dedicated server by le
 
 ## Features
 
-- Downloads the latest Proxmox VE ISO securely using HTTPS.
+- Downloads the latest Proxmox VE ISO securely using HTTP.
 - Allows manual selection of primary and secondary disks for installation.
 - Automates the Proxmox VE installation process via a VNC session.
 - Configures network interfaces for Proxmox VE.
