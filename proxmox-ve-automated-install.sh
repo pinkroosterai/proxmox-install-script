@@ -32,9 +32,35 @@ fi
 
 echo "Latest Proxmox VE ISO Version: $ISO_VERSION"
 echo "ISO URL: $ISO_URL"
-echo "Downloading the Proxmox VE ISO. This may take a while..."
-curl -o /tmp/proxmox-ve.iso $ISO_URL
-check_command $? "Downloading Proxmox VE ISO"
+
+# Check if the ISO file already exists
+if [[ -f /tmp/proxmox-ve.iso ]]; then
+    while true; do
+        read -p "The file /tmp/proxmox-ve.iso already exists. Do you want to overwrite it? (y/n): " overwrite
+        case $overwrite in
+            [Yy]* ) 
+                echo "Deleting existing file and downloading a new one..."
+                rm /tmp/proxmox-ve.iso
+                check_command $? "Deleting existing ISO file"
+                echo "Downloading the Proxmox VE ISO. This may take a while..."
+                curl -o /tmp/proxmox-ve.iso $ISO_URL
+                check_command $? "Downloading Proxmox VE ISO"
+                break
+                ;;
+            [Nn]* ) 
+                echo "Skipping download and proceeding with the existing ISO."
+                break
+                ;;
+            * ) echo "Please answer y or n.";;
+        esac
+    done
+else
+    # If file does not exist, download the ISO
+    echo "Downloading the Proxmox VE ISO. This may take a while..."
+    curl -o /tmp/proxmox-ve.iso $ISO_URL
+    check_command $? "Downloading Proxmox VE ISO"
+fi
+
 
 # Acquire Network Configuration
 echo "Acquiring Network Configuration..."
