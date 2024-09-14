@@ -91,35 +91,21 @@ Once you are connected to the rescue system, you can proceed with the [Usage Ins
 
 ### 1. Download and Prepare the Script
 
-You have two options to download and run the script:
+ ```bash
+ curl -o install_proxmox.sh https://github.com/pinkroosterai/proxmox-install-script/raw/main/proxmox-ve-automated-install.sh
+ ```
 
-- **Option 1: Manually Download and Make Executable**
-  
-  - Save the script to your server with the filename `install_proxmox.sh`:
-  
-    ```bash
-    curl -o install_proxmox.sh https://github.com/pinkroosterai/proxmox-install-script/raw/main/proxmox-ve-automated-install.sh
-    ```
+- Make the script executable:
 
-  - Make the script executable:
+ ```bash
+ chmod +x install_proxmox.sh
+ ```
 
-    ```bash
-    chmod +x install_proxmox.sh
-    ```
+- Run the script:
 
-  - Run the script:
-
-    ```bash
-    ./install_proxmox.sh
-    ```
-
-- **Option 2: Run Directly with curl**
-
-  If you prefer, you can run the script directly without saving it to a file:
-
-  ```bash
-  curl -L https://github.com/pinkroosterai/proxmox-install-script/raw/main/proxmox-ve-automated-install.sh | bash
-  ```
+ ```bash
+ ./install_proxmox.sh
+ ```
 
 ### 2. Run the Script
 
