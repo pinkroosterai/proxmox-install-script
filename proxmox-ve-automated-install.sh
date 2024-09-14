@@ -14,6 +14,10 @@ check_command() {
     fi
 }
 
+# Welcome message
+echo "Welcome to the Proxmox Install Script for dedicated servers..."
+sleep 2
+
 # Downloading Proxmox VE
 echo "Downloading Proxmox VE..."
 
@@ -28,17 +32,6 @@ fi
 
 echo "Latest Proxmox VE ISO Version: $ISO_VERSION"
 echo "ISO URL: $ISO_URL"
-
-# Confirm download
-while true; do
-    read -p "Proceed to download the ISO? (y/n): " proceed
-    case $proceed in
-        [Yy]* ) break;;
-        [Nn]* ) echo "Aborted."; exit 1;;
-        * ) echo "Please answer y or n.";;
-    esac
-done
-
 echo "Downloading the Proxmox VE ISO. This may take a while..."
 curl -o /tmp/proxmox-ve.iso $ISO_URL
 check_command $? "Downloading Proxmox VE ISO"
