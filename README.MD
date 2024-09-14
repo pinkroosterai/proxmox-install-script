@@ -98,13 +98,13 @@ Once you are connected to the rescue system, you can proceed with the [Usage Ins
 - Make the script executable:
 
  ```bash
- chmod +x install_proxmox.sh
+ chmod +x proxmox-ve-automated-install.sh
  ```
 
 - Run the script:
 
  ```bash
- ./install_proxmox.sh
+ ./proxmox-ve-automated-install.sh
  ```
 
 ### 2. Run the Script
