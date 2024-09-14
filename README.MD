@@ -92,7 +92,7 @@ Once you are connected to the rescue system, you can proceed with the [Usage Ins
 ### 1. Download and Prepare the Script
 
  ```bash
- curl -o install_proxmox.sh https://github.com/pinkroosterai/proxmox-install-script/raw/main/proxmox-ve-automated-install.sh
+ wget https://raw.githubusercontent.com/pinkroosterai/proxmox-install-script/main/proxmox-ve-automated-install.sh
  ```
 
 - Make the script executable:
