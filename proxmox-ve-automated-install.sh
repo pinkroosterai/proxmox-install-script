@@ -29,11 +29,15 @@ fi
 echo "Latest Proxmox VE ISO Version: $ISO_VERSION"
 echo "ISO URL: $ISO_URL"
 
-read -p "Proceed to download the ISO? (y/n): " proceed
-if [[ $proceed != "y" ]]; then
-    echo "Aborted."
-    exit 1
-fi
+# Confirm download
+while true; do
+    read -p "Proceed to download the ISO? (y/n): " proceed
+    case $proceed in
+        [Yy]* ) break;;
+        [Nn]* ) echo "Aborted."; exit 1;;
+        * ) echo "Please answer y or n.";;
+    esac
+done
 
 echo "Downloading the Proxmox VE ISO. This may take a while..."
 curl -o /tmp/proxmox-ve.iso $ISO_URL
@@ -60,21 +64,26 @@ echo "IP Address: $IP_ADDRESS"
 echo "CIDR: $CIDR"
 echo "Gateway: $GATEWAY"
 
-read -p "Proceed with these network settings? (y/n): " proceed
-if [[ $proceed != "y" ]]; then
-    echo "Aborted."
-    exit 1
-fi
+# Confirm network settings
+while true; do
+    read -p "Proceed with these network settings? (y/n): " proceed
+    case $proceed in
+        [Yy]* ) break;;
+        [Nn]* ) echo "Aborted."; exit 1;;
+        * ) echo "Please answer y or n.";;
+    esac
+done
 
-# Initiate QEMU and start the Proxmox installation
-echo "Do you want to install Proxmox in UEFI mode? (recommended for most systems)"
-read -p "Enter 'y' for UEFI mode or 'n' for Legacy mode: " uefi_choice
-
-if [[ $uefi_choice == "y" ]]; then
-    BOOT_MODE="UEFI"
-else
-    BOOT_MODE="Legacy"
-fi
+# Ask for boot mode
+while true; do
+    echo "Do you want to install Proxmox in UEFI mode? (recommended for most systems)"
+    read -p "Enter 'y' for UEFI mode or 'n' for Legacy mode: " uefi_choice
+    case $uefi_choice in
+        [Yy]* ) BOOT_MODE="UEFI"; break;;
+        [Nn]* ) BOOT_MODE="Legacy"; break;;
+        * ) echo "Please answer y or n.";;
+    esac
+done
 
 echo "Selected boot mode: $BOOT_MODE"
 
@@ -93,15 +102,30 @@ for i in "${!DISK_LIST[@]}"; do
     echo "$((i+1))) /dev/$DISK_NAME - $DISK_SIZE"
 done
 
-read -p "Enter the number corresponding to the primary disk: " primary_choice
-PRIMARY_DISK=${DISK_LIST[$((primary_choice-1))]}
+# Validate primary disk selection
+while true; do
+    read -p "Enter the number corresponding to the primary disk: " primary_choice
+    if [[ "$primary_choice" =~ ^[0-9]+$ && $primary_choice -ge 1 && $primary_choice -le ${#DISK_LIST[@]} ]]; then
+        PRIMARY_DISK=${DISK_LIST[$((primary_choice-1))]}
+        break
+    else
+        echo "Invalid input. Please enter a valid disk number."
+    fi
+done
 
-read -p "Enter the number corresponding to the secondary disk (or press Enter to skip): " secondary_choice
-if [[ -n "$secondary_choice" ]]; then
-    SECONDARY_DISK=${DISK_LIST[$((secondary_choice-1))]}
-else
-    SECONDARY_DISK=""
-fi
+# Validate secondary disk selection
+while true; do
+    read -p "Enter the number corresponding to the secondary disk (or press Enter to skip): " secondary_choice
+    if [[ -z "$secondary_choice" ]]; then
+        SECONDARY_DISK=""
+        break
+    elif [[ "$secondary_choice" =~ ^[0-9]+$ && $secondary_choice -ge 1 && $secondary_choice -le ${#DISK_LIST[@]} ]]; then
+        SECONDARY_DISK=${DISK_LIST[$((secondary_choice-1))]}
+        break
+    else
+        echo "Invalid input. Please enter a valid disk number."
+    fi
+done
 
 echo "WARNING: The selected disks will be completely erased during the installation."
 echo "Primary Disk: /dev/$PRIMARY_DISK"
@@ -111,11 +135,15 @@ else
     echo "No Secondary Disk selected."
 fi
 
-read -p "Are you sure you want to proceed with these disks? (y/n): " confirm
-if [[ $confirm != "y" ]]; then
-    echo "Operation aborted."
-    exit 1
-fi
+# Confirm disk selection
+while true; do
+    read -p "Are you sure you want to proceed with these disks? (y/n): " confirm
+    case $confirm in
+        [Yy]* ) break;;
+        [Nn]* ) echo "Operation aborted."; exit 1;;
+        * ) echo "Please answer y or n.";;
+    esac
+done
 
 # Check for required packages
 echo "Checking for required packages..."
@@ -131,18 +159,26 @@ for pkg in "${REQUIRED_PACKAGES[@]}"; do
     fi
 done
 
-# Set VNC password
-echo "Please enter VNC password (maximum 8 characters):"
-read -s VNC_PASSWORD1
-echo "Please confirm VNC password:"
-read -s VNC_PASSWORD2
+# Set VNC password with validation
+while true; do
+    echo "Please enter VNC password (maximum 8 characters):"
+    read -s VNC_PASSWORD1
 
-if [[ "$VNC_PASSWORD1" != "$VNC_PASSWORD2" ]]; then
-    echo "Passwords do not match. Exiting."
-    exit 1
-fi
+    if [[ ${#VNC_PASSWORD1} -gt 8 ]]; then
+        echo "Password is too long. It must be 8 characters or less. Please try again."
+        continue
+    fi
 
-VNC_PASSWORD="${VNC_PASSWORD1:0:8}"  # Truncate to 8 characters if longer
+    echo "Please confirm VNC password:"
+    read -s VNC_PASSWORD2
+
+    if [[ "$VNC_PASSWORD1" == "$VNC_PASSWORD2" ]]; then
+        VNC_PASSWORD="$VNC_PASSWORD1"
+        break
+    else
+        echo "Passwords do not match. Please try again."
+    fi
+done
 
 # Start QEMU for Proxmox installation
 if [[ $BOOT_MODE == "UEFI" ]]; then
