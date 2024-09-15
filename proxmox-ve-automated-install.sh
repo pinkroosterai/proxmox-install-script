@@ -408,22 +408,31 @@ fi
 # Create network configuration file
 echo "Creating network configuration file..."
 
-# Use a standard interface name inside the VM (e.g., ens18)
-VM_INTERFACE_NAME="ens18"
+# Get the interface name that Proxmox will use
+PROXMOX_INTERFACE_NAME=$(udevadm info -q all -p /sys/class/net/$INTERFACE_NAME | grep ID_NET_NAME_PATH | cut -d'=' -f2)
+
+# Fallback to the detected interface name if ID_NET_NAME_PATH is not available
+if [[ -z "$PROXMOX_INTERFACE_NAME" ]]; then
+    PROXMOX_INTERFACE_NAME="$INTERFACE_NAME"
+fi
+
+# Get the MAC address of the interface
+MAC_ADDRESS=$(ip link show "$INTERFACE_NAME" | awk '/ether/ {print $2}')
 
 cat > /tmp/proxmox_network_config << EOF
 auto lo
 iface lo inet loopback
 
-iface $VM_INTERFACE_NAME inet manual
+iface $PROXMOX_INTERFACE_NAME inet manual
 
 auto vmbr0
 iface vmbr0 inet static
     address $IP_ADDRESS/$CIDR
     gateway $GATEWAY
-    bridge_ports $VM_INTERFACE_NAME
+    bridge_ports $PROXMOX_INTERFACE_NAME
     bridge_stp off
     bridge_fd 0
+    hwaddress $MAC_ADDRESS
 EOF
 
 echo "Network configuration file created at /tmp/proxmox_network_config"
